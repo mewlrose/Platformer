@@ -1,16 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemyAI : MonoBehaviour
 {
-
     public float gravity;
     public Vector2 velocity;
     public bool isWalkingLeft = true;
     private bool grounded = false;
-    public LayerMask floorMask;
-    public LayerMask wallMask;
+    public LayerMask floorMask, wallMask;
+
+    private bool shouldDie = false;
+    private float deathTimer = 0;
+
+    public float timeBeforeDestroy = 1.0f;
 
     private enum EnemyState
     {
@@ -21,17 +25,39 @@ public class EnemyAI : MonoBehaviour
 
     private EnemyState state = EnemyState.falling;
 
-    // Start is called before the first frame update
     void Start()
     {
         enabled = false;
         Fall();
     }
 
-    // Update is called once per frame
     void Update()
     {
         UpdateEnemyPosition();
+        CheckCrushed();
+    }
+
+    public void Crush()
+    {
+        state = EnemyState.dead;
+        GetComponent<Animator>().SetBool("isCrushed", true);
+        GetComponent<Collider2D>().enabled = false;
+        shouldDie = true;
+    }
+
+    void CheckCrushed()
+    {
+        if (shouldDie)
+        {
+            if (deathTimer <= timeBeforeDestroy)
+            {
+                deathTimer += Time.deltaTime;
+            } else
+            {
+                shouldDie = false;
+                Destroy(this.gameObject);
+            }
+        }
     }
 
     void UpdateEnemyPosition()
@@ -60,9 +86,8 @@ public class EnemyAI : MonoBehaviour
                 }
             }
             if (velocity.y <= 0)
-            {
                 pos = CheckGround(pos);
-            }
+
             CheckWalls(pos, scale.x);
             
             transform.localPosition = pos;
@@ -98,6 +123,10 @@ public class EnemyAI : MonoBehaviour
             {
                 hitRay = groundRight;
             }
+
+            if (hitRay.collider.tag == "Player")
+                SceneManager.LoadScene("Lose");
+
             pos.y = hitRay.collider.bounds.center.y + hitRay.collider.bounds.size.y/2 + 0.5f;
             grounded = true;
             velocity.y = 0;
@@ -105,9 +134,7 @@ public class EnemyAI : MonoBehaviour
         } else
         {
             if (state != EnemyState.falling)
-            {
                 Fall();
-            }
         }
         return pos;
     }
@@ -140,6 +167,9 @@ public class EnemyAI : MonoBehaviour
             {
                 hitRay = wallBottom;
             }
+
+            if (hitRay.collider.tag == "Player")
+                SceneManager.LoadScene("Lose");
 
             isWalkingLeft = !isWalkingLeft;
         }

@@ -4,22 +4,22 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float jumpVelocity;
+    public float jumpVelocity, bounceVelocity, gravity;
     public Vector2 velocity;
-    public float gravity;
-    public LayerMask wallMask;
-    public LayerMask floorMask;
+    public LayerMask wallMask, floorMask;
     private bool walk, walkLeft, walkRight, jump;
 
     public enum PlayerState
     {
         jumping,
         idle,
-        walking
+        walking,
+        bouncing
     }
 
     private PlayerState playerState = PlayerState.idle;
     private bool grounded = false;
+    private bool bounce = false;
 
     void Start()
     {
@@ -65,15 +65,23 @@ public class Player : MonoBehaviour
             velocity.y -= gravity * Time.deltaTime;
         }
 
-        if (velocity.y <= 0)
+        if (bounce && playerState != PlayerState.bouncing)
         {
-            pos = CheckFloorRays(pos);
+            playerState = PlayerState.bouncing;
+            velocity = new Vector2 (velocity.x, bounceVelocity);
         }
 
-        if (velocity.y >= 0)
+        if (playerState == PlayerState.bouncing)
         {
-            pos = CheckCeilingRays(pos);
+            pos.y += velocity.y * Time.deltaTime;
+            velocity.y -= gravity * Time.deltaTime;
         }
+
+        if (velocity.y <= 0)
+            pos = CheckFloorRays(pos);
+
+        if (velocity.y >= 0)
+            pos = CheckCeilingRays(pos);
 
         transform.localPosition = pos;
         transform.localScale = scale;
@@ -81,7 +89,7 @@ public class Player : MonoBehaviour
 
     void UpdateAnimationStates()
     {
-        if (grounded && !walk)
+        if (grounded && !walk && !bounce)
         {
             GetComponent<Animator>().SetBool("isJumping", false);
             GetComponent<Animator>().SetBool("isRunning", false);
@@ -104,7 +112,7 @@ public class Player : MonoBehaviour
     {
         bool inputLeft = Input.GetKey(KeyCode.A);
         bool inputRight = Input.GetKey(KeyCode.D);
-        bool inputSpace = Input.GetKey(KeyCode.S);
+        bool inputSpace = Input.GetKey(KeyCode.Space);
 
         walk = inputLeft || inputRight;
         walkLeft = inputLeft && !inputRight;
@@ -128,9 +136,8 @@ public class Player : MonoBehaviour
                                                     velocity.x * Time.deltaTime, wallMask);
         
         if (wallTop.collider != null || wallMiddle.collider != null || wallBottom.collider != null)
-        {
             pos.x -= velocity.x * Time.deltaTime * direction;
-        }
+
         return pos;
     }
 
@@ -162,6 +169,12 @@ public class Player : MonoBehaviour
             {
                 hitRay = floorRight;
             }
+
+            if (hitRay.collider.tag == "Enemy")
+            {
+                bounce = true;
+                hitRay.collider.GetComponent<EnemyAI>().Crush();
+            }
             
             playerState = PlayerState.idle;
             grounded = true;
@@ -171,9 +184,7 @@ public class Player : MonoBehaviour
         else
         {
             if (playerState != PlayerState.jumping)
-            {
                 Fall();
-            }
         }
         return pos;
     }
@@ -216,6 +227,7 @@ public class Player : MonoBehaviour
     {
         velocity.y = 0;
         playerState = PlayerState.jumping;
+        bounce = false;
         grounded = false;
     }
 }

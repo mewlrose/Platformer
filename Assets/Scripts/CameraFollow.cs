@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform target;
-    public Transform leftBounds;
-    public Transform rightBounds;
+    public Transform target, leftBounds, rightBounds;
 
     public float smoothDampTime = 0.15f;
     public Vector3 smoothDampVelocity = Vector3.zero;
 
     private float camWidth, camHeight, levelMinX, levelMaxX;
-    // Start is called before the first frame update
+
     void Start()
     {
         camHeight = Camera.main.orthographicSize * 2;
@@ -25,7 +23,6 @@ public class CameraFollow : MonoBehaviour
         levelMaxX = rightBounds.position.x - rightBoundsWidth - (camWidth/2);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (target)
