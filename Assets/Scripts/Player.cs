@@ -1,13 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     public float jumpVelocity, bounceVelocity, gravity;
+
     public Vector2 velocity;
     public LayerMask wallMask, floorMask;
+
     private bool walk, walkLeft, walkRight, jump;
+
+    public Text scoreText;
+    public int score = 0;
+
+    public int timeInterval = 1;
+    protected float timeReset;
+
+    public int playerHP = 2;
 
     public enum PlayerState
     {
@@ -16,18 +27,20 @@ public class Player : MonoBehaviour
         walking,
         bouncing
     }
-
     private PlayerState playerState = PlayerState.idle;
+
     private bool grounded = false;
     private bool bounce = false;
 
-    void Start()
-    {
-        
-    }
-
     void Update()
     {
+        timeReset += Time.deltaTime;
+        if (timeReset >= timeInterval)
+        {
+            timeReset = 0f;
+            score++;
+            scoreText.text = score.ToString();
+        }
         CheckPlayerInput();
         UpdatePlayerPosition();
         UpdateAnimationStates();
@@ -112,7 +125,7 @@ public class Player : MonoBehaviour
     {
         bool inputLeft = Input.GetKey(KeyCode.A);
         bool inputRight = Input.GetKey(KeyCode.D);
-        bool inputSpace = Input.GetKey(KeyCode.Space);
+        bool inputSpace = Input.GetKey(KeyCode.W);
 
         walk = inputLeft || inputRight;
         walkLeft = inputLeft && !inputRight;
@@ -174,6 +187,8 @@ public class Player : MonoBehaviour
             {
                 bounce = true;
                 hitRay.collider.GetComponent<EnemyAI>().Crush();
+                score += 20;
+                scoreText.text = score.ToString();
             }
             
             playerState = PlayerState.idle;
@@ -219,7 +234,11 @@ public class Player : MonoBehaviour
             }
 
             if (hitRay.collider.tag == "QuestionBlock")
+            {
                 hitRay.collider.GetComponent<QuestionBlock>().QuestionBlockBounce();
+                score += 10;
+                scoreText.text = score.ToString();
+            }
 
             pos.y = hitRay.collider.bounds.center.y - hitRay.collider.bounds.size.y/2-1;
             Fall();

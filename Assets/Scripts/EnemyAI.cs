@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -124,7 +125,10 @@ public class EnemyAI : MonoBehaviour
                 hitRay = groundRight;
             }
 
-            if (hitRay.collider.tag == "Player")
+            if (hitRay.collider.tag == "Player" && GameObject.Find("Player").GetComponent<Player>().playerHP > 0)
+                GameObject.Find("Player").GetComponent<Player>().playerHP -= 1;
+
+            if (hitRay.collider.tag == "Player" && GameObject.Find("Player").GetComponent<Player>().playerHP == 0)
                 SceneManager.LoadScene("Lose");
 
             pos.y = hitRay.collider.bounds.center.y + hitRay.collider.bounds.size.y/2 + 0.5f;
@@ -168,7 +172,9 @@ public class EnemyAI : MonoBehaviour
                 hitRay = wallBottom;
             }
 
-            if (hitRay.collider.tag == "Player")
+            if (hitRay.collider.tag == "Player" && GameObject.Find("Player").GetComponent<Player>().playerHP > 0)
+                GameObject.Find("Player").GetComponent<Player>().playerHP -= 1;
+            else
                 SceneManager.LoadScene("Lose");
 
             isWalkingLeft = !isWalkingLeft;

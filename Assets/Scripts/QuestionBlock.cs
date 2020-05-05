@@ -27,11 +27,6 @@ public class QuestionBlock : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        
-    }
-
     void ChangeSprite()
     {
         GetComponent<Animator>().enabled = false;

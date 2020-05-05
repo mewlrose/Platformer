@@ -8,6 +8,9 @@ public class Hole : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Player")
-            SceneManager.LoadScene("Lose");
+        {
+            GameObject.Find("Player").GetComponent<Player>().score = 0;
+            SceneManager.LoadScene("Level1");
+        }
     }
 }
