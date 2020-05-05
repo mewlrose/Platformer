@@ -125,12 +125,6 @@ public class EnemyAI : MonoBehaviour
                 hitRay = groundRight;
             }
 
-            if (hitRay.collider.tag == "Player" && GameObject.Find("Player").GetComponent<Player>().playerHP > 0)
-                GameObject.Find("Player").GetComponent<Player>().playerHP -= 1;
-
-            if (hitRay.collider.tag == "Player" && GameObject.Find("Player").GetComponent<Player>().playerHP == 0)
-                SceneManager.LoadScene("Lose");
-
             pos.y = hitRay.collider.bounds.center.y + hitRay.collider.bounds.size.y/2 + 0.5f;
             grounded = true;
             velocity.y = 0;
@@ -173,9 +167,13 @@ public class EnemyAI : MonoBehaviour
             }
 
             if (hitRay.collider.tag == "Player" && GameObject.Find("Player").GetComponent<Player>().playerHP > 0)
-                GameObject.Find("Player").GetComponent<Player>().playerHP -= 1;
-            else
+                if (gameObject.name == "Enemy" || gameObject.name == "Enemy (1)")
+                    GameObject.Find("Player").GetComponent<Player>().playerHP--;
+            if (GameObject.Find("Player").GetComponent<Player>().playerHP == 0)
+            {
                 SceneManager.LoadScene("Lose");
+                Debug.Log("Player is Dead");
+            }
 
             isWalkingLeft = !isWalkingLeft;
         }

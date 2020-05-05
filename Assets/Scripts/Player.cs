@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -15,10 +16,7 @@ public class Player : MonoBehaviour
     public Text scoreText;
     public int score = 0;
 
-    public int timeInterval = 1;
-    protected float timeReset;
-
-    public int playerHP = 2;
+    public int playerHP = 5;
 
     public enum PlayerState
     {
@@ -32,18 +30,22 @@ public class Player : MonoBehaviour
     private bool grounded = false;
     private bool bounce = false;
 
+    void Start()
+    {
+        InvokeRepeating("IncrementScore", 1.0f, 1.0f);
+    }
+
     void Update()
     {
-        timeReset += Time.deltaTime;
-        if (timeReset >= timeInterval)
-        {
-            timeReset = 0f;
-            score++;
-            scoreText.text = score.ToString();
-        }
         CheckPlayerInput();
         UpdatePlayerPosition();
         UpdateAnimationStates();
+    }
+
+    void IncrementScore()
+    {
+        score++;
+        scoreText.text = score.ToString();
     }
 
     void UpdatePlayerPosition()
