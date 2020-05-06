@@ -6,6 +6,7 @@ TagManager:
   tags:
   - QuestionBlock
   - Enemy
+  - Spike
   layers:
   - Default
   - TransparentFX
