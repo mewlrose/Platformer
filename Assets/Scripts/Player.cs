@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     public int score = 0;
 
     public int playerHP = 5;
+    public float slowDownDist = 50;
 
     public enum PlayerState
     {
@@ -192,7 +193,7 @@ public class Player : MonoBehaviour
                 score += 20;
                 scoreText.text = score.ToString();
             }
-            
+
             playerState = PlayerState.idle;
             grounded = true;
             velocity.y = 0;
