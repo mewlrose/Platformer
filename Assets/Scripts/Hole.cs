@@ -12,5 +12,10 @@ public class Hole : MonoBehaviour
             GameObject.Find("Player").GetComponent<Player>().score = 0;
             SceneManager.LoadScene("Level1");
         }
+
+        if (other.tag == "Enemy" || other.tag == "Enemy (1)")
+        {
+            Destroy(this.gameObject);
+        }
     }
 }

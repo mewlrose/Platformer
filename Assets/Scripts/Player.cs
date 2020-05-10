@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     public float jumpVelocity, bounceVelocity, gravity;
 
     public Vector2 velocity;
+    public Vector2 originalVelocity;
     public LayerMask wallMask, floorMask;
 
     private bool walk, walkLeft, walkRight, jump;
@@ -17,7 +18,6 @@ public class Player : MonoBehaviour
     public int score = 0;
 
     public int playerHP = 5;
-    public float slowDownDist = 50;
 
     public enum PlayerState
     {
@@ -33,6 +33,8 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        originalVelocity.x = velocity.x;
+        originalVelocity.y = velocity.y;
         InvokeRepeating("IncrementScore", 1.0f, 1.0f);
     }
 
@@ -241,6 +243,13 @@ public class Player : MonoBehaviour
                 hitRay.collider.GetComponent<QuestionBlock>().QuestionBlockBounce();
                 score += 10;
                 scoreText.text = score.ToString();
+            }
+
+            if (hitRay.collider.tag == "YellowQuestionBlock")
+            {
+                hitRay.collider.GetComponent<QuestionBlock>().QuestionBlockBounce();
+                velocity = originalVelocity;
+                Debug.Log("Player is back to original speed");
             }
 
             pos.y = hitRay.collider.bounds.center.y - hitRay.collider.bounds.size.y/2-1;
